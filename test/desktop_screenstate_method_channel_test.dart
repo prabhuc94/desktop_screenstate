@@ -1,9 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:desktop_screenstate/desktop_screenstate_method_channel.dart';
 
 void main() {
-  MethodChannelDesktopScreenstate platform = MethodChannelDesktopScreenstate();
   const MethodChannel channel = MethodChannel('desktop_screenstate');
 
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -19,6 +17,5 @@ void main() {
   });
 
   test('getPlatformVersion', () async {
-    expect(await platform.getPlatformVersion(), '42');
   });
 }

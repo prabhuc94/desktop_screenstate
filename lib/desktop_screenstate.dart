@@ -5,7 +5,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-enum ScreenState { sleep, awaked, locked, unlocked }
+enum ScreenState { sleep, awaked, locked, unlocked, close, woke_up }
 
 class DesktopScreenState {
   static const MethodChannel _channel = MethodChannel('screenstate');
@@ -68,6 +68,7 @@ class DesktopScreenState {
   Future<dynamic> _handleMethodCall(MethodCall call) async {
     switch (call.method) {
       case "onScreenStateChange":
+        print("Argument ${call.arguments}");
         _onApplicationFocusChange(call.arguments as String);
         break;
       default:

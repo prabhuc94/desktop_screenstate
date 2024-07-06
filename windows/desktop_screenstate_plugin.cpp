@@ -12,6 +12,7 @@
 #include <map>
 #include <memory>
 #include <sstream>
+#include <iostream>
 
 #include <flutter/event_channel.h>
 #include <flutter/event_sink.h>
@@ -87,8 +88,19 @@ DesktopScreenstatePlugin::~DesktopScreenstatePlugin() {
 }
 
 std::optional<HRESULT> DesktopScreenstatePlugin::HandleWindowProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam) {
- 
+
   switch (message) {
+
+      case WM_CLOSE:
+          channel_->InvokeMethod(
+                  "onScreenStateChange",
+                  std::make_unique<flutter::EncodableValue>("close"));
+          break;
+      case WM_QUERYENDSESSION:
+          channel_->InvokeMethod(
+                  "onScreenStateChange",
+                  std::make_unique<flutter::EncodableValue>("close"));
+          break;
    
       case WM_POWERBROADCAST:
             if (wparam == PBT_POWERSETTINGCHANGE) {
@@ -108,28 +120,25 @@ std::optional<HRESULT> DesktopScreenstatePlugin::HandleWindowProc(HWND hwnd, UIN
         std::make_unique<flutter::EncodableValue>("awaked"));
                        }
                         // Display is on
-                    } 
-        //             else if (consoleDisplayState == 2) {
-        //                channel_->InvokeMethod(
-        // "onScreenStateChange",
-        // std::make_unique<flutter::EncodableValue>("dimm"));
-        //                 // Display is dimmed
-        //             }
+                    }
                       }
                 
+            } else if (wparam == PBT_APMRESUMEAUTOMATIC) {
+                channel_->InvokeMethod(
+                        "onScreenStateChange",
+                        std::make_unique<flutter::EncodableValue>("woke_up"));
             }
             break;
-
       case WM_WTSSESSION_CHANGE:
             switch (wparam) {
                 case WTS_SESSION_LOCK:
-                isScreenLocked = true; 
+                isScreenLocked = true;
                   channel_->InvokeMethod(
         "onScreenStateChange",
         std::make_unique<flutter::EncodableValue>("locked"));
                     break;
                 case WTS_SESSION_UNLOCK:
-                isScreenLocked = false; 
+                isScreenLocked = false;
                   channel_->InvokeMethod(
         "onScreenStateChange",
         std::make_unique<flutter::EncodableValue>("unlocked"));
